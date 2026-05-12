@@ -10,7 +10,33 @@ const XLSX = require('xlsx');
 const fs = require('fs');  
 const path = require('path');  
   
-const XLSX_PATH = path.join(__dirname, '../public/data/유통_필수취급raw.xlsx');  
+const DATA_DIR = path.join(__dirname, '../public/data');  
+const xlsxFiles = fs.readdirSync(DATA_DIR).filter((f) => f.endsWith('.xlsx'));  
+  
+if (xlsxFiles.length === 0) {  
+  console.error('❌ public/data/ 폴더에 xlsx 파일이 없습니다.');  
+  process.exit(1);  
+}  
+  
+// 여러 개면 최신 파일 자동 선택  
+const XLSX_FILE = xlsxFiles.sort().reverse()[0];  
+const XLSX_PATH = path.join(DATA_DIR, XLSX_FILE);  
+console.log(`📂 사용 파일: ${XLSX_FILE}`);  
+  
+// 파일명에서 날짜 자동 추출 (YYYYMMDD 패턴)  
+const dateMatch = XLSX_FILE.match(/(\d{4})(\d{2})(\d{2})/);  
+const lastUpdate = dateMatch  
+  ? {  
+      date:      `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}`,  
+      version:   `${dateMatch[2]}/${dateMatch[3]} 업데이트`,  
+      updatedBy: '이동현',  
+    }  
+  : {  
+      date:      new Date().toISOString().slice(0, 10),  
+      version:   '업데이트',  
+      updatedBy: '이동현',  
+    };  
+console.log(`📅 업데이트 날짜: ${lastUpdate.date}`);  
 const OUTPUT_DIR = path.join(__dirname, '../public/data/asa');  
 const META_PATH = path.join(__dirname, '../public/data/meta.json');  
   
