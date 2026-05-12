@@ -239,7 +239,7 @@ const main = () => {
         const safeName = `${sheetName}_${data.org}_${data.md}`.replace(/[/\\?%*:|"<>]/g, '_');  
         const fileName = `${safeName}.json`;  
         const filePath = path.join(OUTPUT_DIR, fileName);  
-        fs.writeFileSync(filePath, JSON.stringify(data), 'utf8');  
+        fs.writeFileSync(filePath, JSON.stringify(data, null, 0), 'utf8');  
   
         const avgRate = data.stores.length  
           ? Math.round(data.stores.reduce((s, d) => s + d.rate, 0) / data.stores.length * 10) / 10  
@@ -285,7 +285,7 @@ const main = () => {
     meta.lastUpdate = JSON.parse(fs.readFileSync(lastUpdatePath, 'utf8'));  
   }  
   
-  fs.writeFileSync(META_PATH, JSON.stringify(meta), 'utf8');  
+ fs.writeFileSync(META_PATH, JSON.stringify(meta, null, 0), 'utf8');  
   
   console.log(`\n✅ 변환 완료!`);  
   console.log(` - 영업부서(R): ${Object.keys(metaMDs).length}개`);  
