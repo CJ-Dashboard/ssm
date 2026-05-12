@@ -280,17 +280,16 @@ const main = () => {
     })),  
   };  
   
-  const lastUpdatePath = path.join(__dirname, '../public/data/lastUpdate.json');  
-  if (fs.existsSync(lastUpdatePath)) {  
-    meta.lastUpdate = JSON.parse(fs.readFileSync(lastUpdatePath, 'utf8'));  
-  }  
+    // ✅ 파일명에서 추출한 날짜 자동 반영  
+  meta.lastUpdate = lastUpdate;  
   
- fs.writeFileSync(META_PATH, JSON.stringify(meta, null, 0), 'utf8');  
+  fs.writeFileSync(META_PATH, JSON.stringify(meta, null, 0), 'utf8');  
   
   console.log(`\n✅ 변환 완료!`);  
   console.log(` - 영업부서(R): ${Object.keys(metaMDs).length}개`);  
   console.log(` - MD팀장: ${totalMD}명`);  
   console.log(` - 점포: ${totalStores}개\n`);  
-};  
+};  // ← main 함수 닫는 괄호  
   
-main();  
+main();  // ← main 함수 호출  
+ 
