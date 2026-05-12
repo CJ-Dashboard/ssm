@@ -133,36 +133,34 @@ const parseSheet = (raw2d, sheetName) => {
     }  
   }  
   
-  // ③ 점포별 취급률 계산  
-  const stores = Object.values(storeMap).map((store) => {  
-    const allSkuCodes = skus.map((s) => s.code);  
-    const applicable = allSkuCodes.filter((c) =>  
-      store.handling[c] === 0 || store.handling[c] === 1  
-    );  
-    const handled = applicable.filter((c) => store.handling[c] === 1);  
-    const rate = applicable.length > 0  
-      ? Math.round(handled.length / applicable.length * 1000) / 10  
-      : 0;  
+  // ③ 점포별 취급률 계산 (전체 SKU 36개 기준)  
+const stores = Object.values(storeMap).map((store) => {  
+  const allSkuCodes = skus.map((s) => s.code);  
   
-    // 카테고리별 취급률  
-    const catRates = {};  
-    categories.forEach((cat) => {  
-      const catSkus = skus.filter((s) => s.category === cat).map((s) => s.code);  
-      const catApp = catSkus.filter((c) => store.handling[c] === 0 || store.handling[c] === 1);  
-      const catHand = catApp.filter((c) => store.handling[c] === 1);  
-      catRates[cat] = catApp.length > 0  
-        ? Math.round(catHand.length / catApp.length * 1000) / 10  
-        : null;  
-    });  
+  // ✅ RAW에 없는 SKU → 미취급(0)으로 처리  
+  const handled = allSkuCodes.filter((c) => store.handling[c] === 1);  
+  const rate = allSkuCodes.length > 0  
+    ? Math.round(handled.length / allSkuCodes.length * 1000) / 10  
+    : 0;  
   
-    return {  
-      ...store,  
-      rate,  
-      catRates,  
-      handledTotal:  handled.length,  
-      requiredTotal: applicable.length,  
-    };  
+  // 카테고리별 취급률 (전체 기준)  
+  const catRates = {};  
+  categories.forEach((cat) => {  
+    const catSkus = skus.filter((s) => s.category === cat).map((s) => s.code);  
+    const catHand = catSkus.filter((c) => store.handling[c] === 1);  
+    catRates[cat] = catSkus.length > 0  
+      ? Math.round(catHand.length / catSkus.length * 1000) / 10  
+      : null;  
   });  
+  
+  return {  
+    ...store,  
+    rate,  
+    catRates,  
+    handledTotal:  handled.length,        // ✅ 취급 SKU 수  
+    requiredTotal: allSkuCodes.length,    // ✅ 전체 SKU 수 (36개)  
+  };  
+});  
   
   return { stores, skus, categories };  
 };  
